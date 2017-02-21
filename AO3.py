@@ -78,20 +78,41 @@ def crawArticle(url,txtName=None):
 	else:
 		getAndSaveContent(content, txtName, 'w')
 
+def workMessage(ExList):
+	listMessage="ExistedFile: \n"
+	ExList.sort(lambda x,y:cmp(os.path.getmtime(x),os.path.getmtime(y)), reverse=True)
+	i=0
+	for f in ExList:
+		listMessage=listMessage+str(i)+" "+f+"\n"
+		i=i+1
+		if i > 15: break
+	while True:
+		num=raw_input(listMessage)
+		while True:
+			try:
+				num=int(num)
+				break
+			except ValueError, e:
+				num=raw_input("ValueError, again: ")
+		if num == -1:
+			return True,None
+		if num < -1 or num >= len(ExList):
+			again=raw_input("Out of range,again?(y): ")
+			if again == 'y':
+				continue
+			else:
+				return False,None
+		else:
+			print "choose:",num
+			txt=ExList[num]
+			return True,txt
+
+
 systemSet()
 url=argv[1]
-listMessage="ExistedFile: \n"
 ExList=os.walk("./").next()[2]
-ExList.sort(lambda x,y:cmp(os.path.getmtime(x),os.path.getmtime(y)), reverse=True)
-i=0
-for f in ExList:
-	listMessage=listMessage+str(i)+" "+f+"\n"
-	i=i+1
-	if i > 15: break
-num=input(listMessage)
-if num == -1 or num >= len(ExList):
-	txt=None
+start,txt=workMessage(ExList)
+if start:
+	crawArticle(url,txt)
 else:
-	txt=ExList[num]
-
-crawArticle(url,txt)
+	print "Out!"
