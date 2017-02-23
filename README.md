@@ -1,1 +1,2 @@
 # PythonScripts
+虽然仓库名写的是PythonScript，但是包含各种语言的小脚本
