@@ -1,0 +1,161 @@
+<?php
+function blogsend($blog_url,$blog_post,$head_blog) {
+    $connect=curl_init($blog_url);
+    curl_setopt($connect,CURLOPT_HTTPHEADER,$head_blog);
+    curl_setopt($connect, CURLOPT_HEADER, 0);
+    curl_setopt($connect, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($connect, CURLOPT_POST, 1);
+    curl_setopt($connect, CURLOPT_POSTFIELDS, $blog_post);
+    curl_setopt($connect,CURLINFO_HEADER_OUT,true);
+    $contents=curl_exec($connect);curl_close($connect);
+    if(strpos($contents, "成功") !== false) echo "blog send:succeeded\n";
+    else echo "blog send:failed";
+    file_put_contents('out0.html',$contents.PHP_EOL,FILE_APPEND);
+}
+function getmission($head_item) {
+    sleep(2);
+    $head_mission=$head_item;
+    $head_mission[0]="GET /home.php?mod=task&do=apply&id=1 HTTP/1.1";
+    $head_mission[8]="Referer: http://www.uchiha-sasuke.net/home.php?mod=task";
+    $head_mission[10]="Cookie: DrkL_2132_lastvisit=1475645194; DrkL_2132_auth=e5455FhbdWSb%2Bf4jNpnrenlFXI58%2FhVCh0LmNo%2Fzs4lx7wwhaBCLxS8BKv3Ya2jBlIwlde7p1DB%2BK4HrlRniuRALnw; DrkL_2132_home_readfeed=1475735683; DrkL_2132_forum_lastvisit=D_2_1475732565D_10_1475735977; DrkL_2132_smile=1D1; DrkL_2132_mrd=%09; DrkL_2132_ulastactivity=e268S6CfWfrwshlqnO1tFxKSsvZA5kQjvuc14l44vn%2Faq7VfvSdJ; DrkL_2132_sid=YxXzTD; DrkL_2132_checkpm=1; DrkL_2132_lastact=1475770819%09home.php%09misc; DrkL_2132_sendmail=1";
+    $mission_get="http://www.uchiha-sasuke.net/home.php?mod=task&do=apply&id=1";
+    
+    $connect=curl_init($mission_get);
+    curl_setopt($connect, CURLOPT_HTTPHEADER,$head_mission);
+    curl_setopt($connect, CURLOPT_RETURNTRANSFER, 1);
+    $contents=curl_exec($connect);
+    if(strpos($contents, "成功") !== false) echo "mission get:succeeded\n";
+    else echo "mission get:failed\n";
+    curl_close($connect);
+    file_put_contents('out0.html',$contents.PHP_EOL,FILE_APPEND);
+}
+function finishmission($head_item) {
+    sleep(2);
+    $head_mission=$head_item;
+    $head_mission[0]="GET /home.php?mod=task&do=draw&id=1 HTTP/1.1";
+    $head_mission[8]="Referer: http://www.uchiha-sasuke.net/home.php?mod=task&item=doing";
+    $head_mission[10]="Cookie: DrkL_2132_lastvisit=1475645194; DrkL_2132_auth=e5455FhbdWSb%2Bf4jNpnrenlFXI58%2FhVCh0LmNo%2Fzs4lx7wwhaBCLxS8BKv3Ya2jBlIwlde7p1DB%2BK4HrlRniuRALnw; DrkL_2132_home_readfeed=1475735683; DrkL_2132_forum_lastvisit=D_2_1475732565D_10_1475735977; DrkL_2132_ulastactivity=e268S6CfWfrwshlqnO1tFxKSsvZA5kQjvuc14l44vn%2Faq7VfvSdJ; DrkL_2132_taskdoing_33205=1; DrkL_2132_mrd=%09; DrkL_2132_fid2=1475772067; DrkL_2132_fid8=1475770323; DrkL_2132_smile=1D1; DrkL_2132_sendmail=1; DrkL_2132_sid=gAhG5J; DrkL_2132_lastact=1475772648%09home.php%09spacecp; DrkL_2132_checkpm=1";
+    
+    $mission_over="http://www.uchiha-sasuke.net/home.php?mod=task&do=draw&id=1";
+
+    $connect=curl_init($mission_over);
+    curl_setopt($connect, CURLOPT_HTTPHEADER,$head_mission);
+    curl_setopt($connect, CURLOPT_RETURNTRANSFER, 1);
+    $contents=curl_exec($connect);
+    if(strpos($contents, "成功") !== false) echo "mission over:succeeded\n";
+    else echo "mission over:failed\n";
+    curl_close($connect);
+    file_put_contents('out0.html',$contents.PHP_EOL,FILE_APPEND);
+}
+function item($item_url,$send_post,$head_item) {
+    $fileget=fopen("inputdata.txt","r");
+    $i=0;
+    while(!feof($fileget)) {
+        $i=$i+1;
+        $fid=fgets($fileget);
+        $fid=substr($fid,0,-2);
+        $tid=fgets($fileget);
+        $tid=substr($tid,0,-2);
+        $content=fgets($fileget);
+        $content=substr($content,0,-2);
+        fgets($fileget);
+        //echo $fid." ".$tid." ".$content."\n";
+    
+        $item_url="http://www.uchiha-sasuke.net/forum.php?mod=post&action=reply&fid=".$fid."&tid=".$tid."&extra=&replysubmit=yes&infloat=yes&handlekey=fastpost&inajax=1";
+    
+        $head_item[0]="POST /forum.php?mod=post&action=reply&fid=".$fid."&tid=".$tid."&extra=&replysubmit=yes&infloat=yes&handlekey=fastpost&inajax=1 HTTP/1.1";
+        $head_item[8]= "Referer: http://www.uchiha-sasuke.net/forum.php?mod=viewthread&tid=".$tid;
+    
+        $send_post=array();
+        $send_post['message']=$content;
+        $send_post['message']=iconv("UTF-8", "GB2312//IGNORE", $send_post['message']);
+        $send_post['posttime']=time();
+        $send_post['formhash']='f0df4163';
+        $send_post['subject']='';
+    
+        $connect=curl_init($item_url);
+        curl_setopt($connect, CURLOPT_HTTPHEADER,$head_item);
+        curl_setopt($connect, CURLOPT_HEADER, 0);
+        curl_setopt($connect, CURLOPT_RETURNTRANSFER, 1);
+        //curl_setopt($connect,CURLOPT_COOKIEFILE,$cookie_file);
+        curl_setopt($connect, CURLOPT_POST, 1);
+        curl_setopt($connect, CURLOPT_POSTFIELDS, $send_post);
+        curl_setopt($connect,CURLINFO_HEADER_OUT,true);
+        $contents=curl_exec($connect);
+        //$contents=curl_getinfo($connect,CURLINFO_HEADER_OUT);
+        curl_close($connect);
+        file_put_contents('out0.html',$contents.PHP_EOL,FILE_APPEND);
+        if(strpos($contents, "成功") !== false) echo $i." complete\n";
+        else echo $i." error\n";
+        sleep(65);
+    }
+    fclose($fileget);
+}
+
+
+$item_url="http://www.uchiha-sasuke.net/forum.php?mod=post&action=reply&fid=4&tid=95196&extra=&replysubmit=yes&infloat=yes&handlekey=fastpost&inajax=1";
+$blog_url='http://www.uchiha-sasuke.net/home.php?mod=spacecp&ac=blog&blogid=';
+//$request_url='http://www.uchiha-sasuke.net/forum.php?mod=post&action=reply&fid=4&tid=95196&extra=&replysubmit=yes&infloat=yes&handlekey=fastpost&inajax=1';
+//$login_url='http://www.uchiha-sasuke.net/member.php?mod=logging&action=login&loginsubmit=yes&infloat=yes&lssubmit=yes&inajax=1';
+$sig_url='http://www.uchiha-sasuke.net/home.php?mod=spacecp&ac=doing&handlekey=doing&inajax=1';
+
+$blog_post=array();
+$blog_post['subject']='nofog';
+$blog_post['message']='keepgoing';
+$blog_post['catid']=2;
+$blog_post['classid']=0;
+$blog_post['tag']='';
+$blog_post['friend']=0;
+$blog_post['password']='';
+$blog_post['selectgroup']='';
+$blog_post['target_names']='';
+$blog_post['makefeed']='1';
+$blog_post['blogsubmit']='true';
+$blog_post['formhash']='f0df4163';
+
+$send_post=array();
+$send_post['message']="原定计划没完成到一半……不开心";
+$send_post['message']=iconv("UTF-8", "GB2312//IGNORE", $send_post['message']);
+$send_post['posttime']=time();
+$send_post['formhash']='f0df4163';
+$send_post['subject']='';
+
+
+$head_blog=array(
+    "POST /home.php?mod=spacecp&ac=blog&blogid= HTTP/1.1",
+    "Host: www.uchiha-sasuke.net",
+    "Connection: keep-alive",
+    "Cache-Control: max-age=0",
+    "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Origin: http://www.uchiha-sasuke.net",
+    "Upgrade-Insecure-Requests: 1",
+    "User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.22 Safari/537.36 SE 2.X MetaSr 1.0",
+    "Referer: http://www.uchiha-sasuke.net/home.php?mod=spacecp&ac=blog",
+    "Accept-Language: zh-CN,zh;q=0.8",
+    "Cookie: DrkL_2132_lastvisit=1475645194; DrkL_2132_auth=e5455FhbdWSb%2Bf4jNpnrenlFXI58%2FhVCh0LmNo%2Fzs4lx7wwhaBCLxS8BKv3Ya2jBlIwlde7p1DB%2BK4HrlRniuRALnw; DrkL_2132_forum_lastvisit=D_2_1475655367; DrkL_2132_mrd=%09; DrkL_2132_ulastactivity=80f0avHEI7v%2FRv%2BizF8x699ehtllFlziLxkP5rmcVhddJg20KJgz; DrkL_2132_sendmail=1; DrkL_2132_smile=1D1; DrkL_2132_onlineusernum=23; DrkL_2132_home_readfeed=1475730981; DrkL_2132_checkpm=1; DrkL_2132_sid=5J5Dlr; DrkL_2132_lastact=1475730991%09home.php%09editor"
+);
+
+$head_item=array(
+    "POST /forum.php?mod=post&action=reply&fid=4&tid=95196&extra=&replysubmit=yes&infloat=yes&handlekey=fastpost&inajax=1 HTTP/1.1",
+    "Host: www.uchiha-sasuke.net",
+    "Connection: keep-alive",
+    "Cache-Control: max-age=0",
+    "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Origin: http://www.uchiha-sasuke.net",
+    "Upgrade-Insecure-Requests: 1",
+    "User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.22 Safari/537.36 SE 2.X MetaSr 1.0",
+    "Referer: http://www.uchiha-sasuke.net/forum.php?mod=viewthread&tid=95196",
+    "Accept-Language: zh-CN,zh;q=0.8",
+    "Cookie: DrkL_2132_lastvisit=1475645194; DrkL_2132__refer=%252Fhome.php%253Fmod%253Dspacecp%2526ac%253Dpm%2526op%253Dchecknewpm%2526rand%253D1475652921; DrkL_2132_view_blogid=1981; DrkL_2132_auth=e5455FhbdWSb%2Bf4jNpnrenlFXI58%2FhVCh0LmNo%2Fzs4lx7wwhaBCLxS8BKv3Ya2jBlIwlde7p1DB%2BK4HrlRniuRALnw; DrkL_2132_mrd=%09; DrkL_2132_ulastactivity=91e6y0Sa4NTgTXKUBQvp0eqoYF7BR69iAiC36bOac4GiqEt8uhuD; DrkL_2132_home_readfeed=1475653107; DrkL_2132_fid4=1475653354; DrkL_2132_sendmail=1; DrkL_2132_fid2=1475648614; DrkL_2132_smile=1D1; DrkL_2132_lastact=1475654138%09home.php%09task; DrkL_2132_sid=1kEgDg"
+);
+
+
+//getmission($head_item);
+//item($item_url,$send_post,$head_item,$blog_url,$blog_post,$head_blog);
+blogsend($blog_url,$blog_post,$head_blog);
+//finishmission($head_item);
+
+
+
+?>
+
